@@ -1,0 +1,189 @@
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
+        :root { --base-color: #4CAF50; --border-color: #f0f0f0; --ui-color: #fca311; --shadow: 2px 2px 0 rgba(0,0,0,0.4);}
+        body { background-color: #1a1a2e; color: #f0f0f0; font-family: 'M PLUS Rounded 1c', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        #game-wrapper { position: relative; width: 95%; max-width: 1080px; height: 500px; background-image: url('images/background.png'); background-size: cover; background-position: center; border: 5px solid var(--border-color); border-radius: 10px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); overflow: hidden; }
+        #background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0; /* ふだんは透明 */
+    z-index: 0;
+}
+
+#game-wrapper.fade-in-background #background-overlay {
+    opacity: 1; /* このクラスが付くと、1秒かけてフワッと表示される */
+    transition: opacity 1s ease-in-out;
+}
+        #effects-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #monster-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+      #base { 
+    position: absolute; 
+    right: 20px; 
+    top: 35%; 
+    transform: translateY(-50%); 
+    width: 200px; 
+    height: auto; 
+    background-color: transparent; 
+    border: none; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 3; /* 影が他の要素に隠れないようにする */
+}
+#base::before {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* 影の位置 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%; /* 影のよこ幅 */
+    height: 30px; /* 影のたて幅 */
+    background: rgba(0, 0, 0, 0.4); /* 影の色 */
+    border-radius: 50%;
+    filter: blur(8px); /* 影をぼかす */
+    z-index: -1; /* 影を拠点画像の後ろにする */
+}
+        #base-image { width: 200px; height: 200px; object-fit: contain; }
+        #base-status { width: auto; background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 10px; margin-top: 5px; text-align: center; }
+        #base-status .hp-bar-container { width: 150px; }
+        #base-status p { margin: 5px 0 0 0; font-size: 0.9em; font-weight: bold; }
+        .hp-bar-container { height: 15px; background-color: #333; border: 1px solid #fff; border-radius: 8px; overflow: hidden; }
+        #base-hp-bar { height: 100%; background-color: var(--base-color); transition: width 0.3s; }
+        #base.damage { animation: shake 0.3s; }
+        .monster { position: absolute; width: 64px; height: 64px; background-color: transparent; cursor: pointer; }
+        .monster::before { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 70%; height: 15px; background: rgba(0, 0, 0, 0.5); border-radius: 50%; filter: blur(4px); z-index: -1; }
+        .monster.flying::before { bottom: -85px; transform: translateX(-50%) scale(0.8); background: rgba(0, 0, 0, 0.25); }
+        .monster.monster-boss::before {
+            bottom: -170px; /* この数値を調整して、影の上下の位置を決めます */
+            width: 250%;   /* 影の横はばです */
+            height: 25px;  /* 影のたてはばです */
+        }
+        .monster-large .monster-image { transform: scale(3.5); }
+        .monster-medium .monster-image { transform: scale(1.8); }
+        .monster-image { width: 100%; height: 100%; object-fit: contain; }
+        .monster.active { transform: scale(1.1); z-index: 1000 !important; }
+        .monster.active .monster-image { filter: drop-shadow(0 0 8px #ffc107); }
+        .monster-status { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 5px; width: auto; white-space: nowrap; }
+
+           .monster-boss .monster-status {
+            bottom: -90px; /* この数値を調整 */
+        }
+        .monster-status .hp-bar-container { width: 60px; height: 8px; }
+        .monster-hp-bar { height: 100%; background-color: #ff4d4d; border-radius: 3px; transition: width 0.3s;}
+        .monster-hp-text { font-size: 0.8em; color: white; font-weight: bold; }
+        .question-follow { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 8px; color: #ffeb3b; font-size: 1.5em; font-weight: bold; white-space: nowrap; pointer-events: none; z-index: 10; }
+        .question-follow.long-question { white-space: normal; width: 350px; font-size: 1.1em; top: -80px; line-height: 1.4; }
+        .question-follow.emoji-question { width: auto; font-size: 1.8em; }
+        #answer-ui-wrapper { position: absolute; bottom: 10px; left: 10px; display: flex; align-items: stretch; gap: 8px; z-index: 100; }
+        #left-input-area { display: flex; flex-direction: column; justify-content: flex-start; gap: 10px; }
+        #answer-area { background-color: rgba(22, 33, 62, 0.95); padding: 5px 10px; border-radius: 10px; border: 2px solid var(--ui-color); box-shadow: var(--shadow); display: flex; align-items: center; gap: 6px; }
+        #answer-input { font-family: 'M PLUS Rounded 1c', sans-serif; width: 100px; padding: 5px; font-size: 1.5em; text-align: center; border: 2px solid #9a8c98; border-radius: 5px; -moz-appearance: textfield; }
+        #answer-input::-webkit-outer-spin-button, #answer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #numpad { background: #1e2a38; padding: 8px; border-radius: 8px; border: 2px solid var(--ui-color); box-shadow: var(--shadow); display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 140px; height: 140px; }
+        .numpad-button { width: auto; height: auto; font-size: 1.1em; font-weight: bold; background-color: #535f7f; color: white; border: 1px solid #9a8c98; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: center; align-items: center; }
+        .numpad-button:hover { background-color: #6d7b9f; }
+        #numpad-clear { background-color: #b71c1c;}
+        #numpad-enter { background-color: #1976d2; }
+        .screen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; text-align: center; color: white; }
+        .screen-overlay h1, .screen-overlay h2 { color: var(--ui-color); font-size: 3em; margin-bottom: 30px; }
+        .screen-overlay button, .numpad-button, #pause-button { font-family: 'M PLUS Rounded 1c', sans-serif; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.1s ease-in-out; touch-action: manipulation; }
+        .screen-overlay button { font-size: 1.5em; padding: 15px 30px; background-color: var(--ui-color); color: #16213e; box-shadow: 0 5px 0 #c78100; }
+        .screen-overlay button:hover { background-color: #e9c46a; }
+        .screen-overlay button:active { transform: translateY(3px); box-shadow: 0 2px 0 #c78100; }
+        #title-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 画像をコンテナいっぱいに広げます */
+            z-index: 199; /* screen-overlay(200)のすぐ下に配置 */
+        }
+        
+        /* ↓↓ 既存の#start-screenのスタイルを少し変更します ↓↓ */
+        #start-screen {
+            background-color: transparent; 
+        }
+
+        /* ↓↓ #start-screen .button-container のスタイルを調整します ↓↓ */
+        #start-screen .button-container {
+            position: absolute; /* 位置を自由に動かせるようにします */
+            bottom: 60px;       /* 下から60pxの位置に */
+            right: 60px;        /* 右から60pxの位置に */
+            flex-direction: column; /* ボタンは縦並びのまま */
+            gap: 15px;          /* ボタンとボタンの間隔 */
+        }
+        .button-container { display: flex; gap: 20px; flex-direction: row; }
+        #pause-screen .button-container { flex-direction: column; }
+        .hidden { display: none; }
+        .damage-popup { position: absolute; font-size: 2em; font-weight: bold; color: #ffdd00; text-shadow: 2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000; pointer-events: none; animation: fade-up 1s ease-out forwards; z-index: 2000; }
+        .damage-popup.wrong-answer { color: #e63946; }
+        .damage-popup.gold-popup { color: #FFD700; font-size: 2.2em; }
+        #bottom-right-ui-wrapper { position: absolute; bottom: 10px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 100; }
+        #bottom-status-bar { display: flex; align-items: center; gap: 15px; }
+        #gold-display, #pause-button, #volume-button { background-color: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; border: 2px solid var(--ui-color); box-shadow: var(--shadow); font-size: 1.5em; font-weight: bold; color: #ffeb3b; }
+        #pause-button, #volume-button { cursor: pointer; transition: background-color 0.2s; }
+        #pause-button:hover, #volume-button:hover { background-color: rgba(40,40,40,0.8); }
+        #shop-panel-container { display: flex; gap: 12px; position: relative; }
+        .shop-panel { width: 95px; height: 95px; background-color: rgba(0,0,0,0.5); border: 2px solid var(--ui-color); box-shadow: var(--shadow); border-radius: 12px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 5px; box-sizing: border-box; position: relative; overflow: hidden; }
+        .shop-panel-img { width: 100%; height: 60%; object-fit: contain; }
+        .shop-panel-price { font-size: 1em; font-weight: bold; color: #ffeb3b; height: 30%; display: flex; align-items: center; justify-content: center; }
+        .shop-panel.unaffordable { opacity: 0.4; cursor: not-allowed; }
+        .shop-panel.sold-out { opacity: 0.6; cursor: not-allowed; background-color: rgba(50,50,50,0.7); border-color: #888; }
+        .shop-panel.sold-out .shop-panel-price { color: #aaa; }
+        #item-tooltip { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); width: 280px; background-color: rgba(22, 33, 62, 0.95); border: 2px solid var(--ui-color); box-shadow: var(--shadow); border-radius: 10px; padding: 15px; text-align: center; z-index: 110; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+        #item-tooltip.visible { opacity: 1; }
+        #tooltip-name { font-size: 1.2em; margin: 0 0 5px 0; color: var(--ui-color);}
+        #tooltip-description { font-size: 0.9em; margin: 0; }
+        #tooltip-instruction { font-size: 0.8em; margin-top: 10px; color: #aaa; }
+       .monster.swept { 
+    transform: translateX(-1200px) rotate(-720deg); /* 左へ大きく移動しながら回転 */
+    transition: transform 1s ease-out; /* 1秒かけてアニメーション */
+}
+        .slow-field { position: absolute; width: 300px; height: 120px; border-radius: 50%; pointer-events: none; }
+        #placement-preview { position: absolute; pointer-events: none; z-index: 10; width: 300px; height: 120px; border-radius: 50%; background-color: rgba(0, 150, 255, 0.4); border: 2px dashed #fff; box-sizing: border-box; }
+        .placing-cursor { cursor: crosshair !important; }
+        #kill-counter { background-color: rgba(0,0,0,0.6); padding: 5px 8px; border-radius: 10px; font-size: 1.1em; font-weight: bold; color: #fff; box-shadow: var(--shadow); border: 2px solid #aaa; text-align: left; }
+        
+        .result-content { position: relative; background: rgba(22, 33, 62, 0.95); border: 2px solid var(--ui-color); padding: 20px 40px; border-radius: 10px; text-align: center; max-width: 90%; width: 650px; margin-bottom: 20px; max-height: 80vh; overflow-y: auto; }
+        .result-content h2 { color: var(--ui-color); font-size: 2.2em; margin-top: 0; }
+        .result-score-area { margin-bottom: 25px; }
+        .result-score-title { font-size: 1.2em; color: #ccc; }
+        #result-score-wrapper { position: relative; display: inline-block; margin: 5px 0; }
+        #result-score { font-size: 6em; font-weight: bold; color: #ffeb3b; line-height: 1; text-shadow: 3px 3px 0 #c78100; }
+        .result-unit { font-size: 2em; margin-left: 10px; }
+        #result-comment { font-size: 1.4em; font-weight: bold; margin: 5px 0 0 0; }
+        .result-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; text-align: left; }
+        .result-detail-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; }
+        .result-detail-title { font-size: 1em; color: #ccc; margin-bottom: 5px; border-bottom: 1px dashed #666; padding-bottom: 5px; }
+        .result-detail-value { font-size: 1.8em; font-weight: bold; text-align: center; }
+        .result-wrong-questions { text-align: left; }
+        #wrong-questions-list { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px 10px 10px 40px; margin-top: 5px; height: 120px; overflow-y: auto; list-style-type: '❌ '; }
+        #wrong-questions-list li { padding: 4px 0; font-size: 0.9em; }
+
+        #score-effects-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 201;}
+        .sparkle { position: absolute; width: 10px; height: 10px; background-color: #ffeb3b; border-radius: 50%; animation: sparkle-anim 1.2s infinite; box-shadow: 0 0 10px #ffeb3b; }
+        @keyframes sparkle-anim { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        .manual-content { background: rgba(22, 33, 62, 0.95); border: 2px solid var(--ui-color); padding: 10px 30px 20px 30px; border-radius: 10px; text-align: left; max-width: 90%; width: 600px; margin-bottom: 20px; max-height: 80vh; overflow-y: auto; }
+        .manual-section { display: flex; align-items: center; gap: 20px; padding: 10px 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.2); }
+        .manual-section:last-child { border-bottom: none; }
+        .manual-text { flex: 1; }
+        .manual-image { width: 90px; height: 90px; flex-shrink: 0; }
+        .manual-image img { width: 100%; height: 100%; object-fit: contain; }
+        .manual-content h3 { color: var(--ui-color); border-bottom: 1px solid var(--ui-color); padding-bottom: 3px; margin: 15px 0 5px 0; font-size: 1.1em; }
+        .manual-content p { line-height: 1.7; margin: 0; }
+        
+        #wave-start-screen { position: absolute; top: 25%; left: 0; width: 100%; background-color: rgba(0,0,0,0.7); color: white; text-align: center; padding: 20px 0; z-index: 150; animation: fadeInOut 4s ease-in-out; pointer-events: none; }
+        #wave-title { font-size: 2.5em; margin: 0; }
+        #wave-monster-previews { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .wave-monster-preview-img { width: 50px; height: 50px; object-fit: contain; transform: scale(1.1); }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 80% { opacity: 1; } }
+        @keyframes fade-up { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        @keyframes shake { 0%, 100% { transform: translateY(-50%) translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-8px); } 20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(8px); } }
