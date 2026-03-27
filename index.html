@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>さんすうドリル ディフェンス</title>
 <!-- 1. サイトのタイトル -->
     <meta property="og:title" content="さんすうドリル ディフェンス">
@@ -104,7 +104,7 @@
         .hp-bar-container { height: 15px; background-color: #333; border: 1px solid #fff; border-radius: 8px; overflow: hidden; }
         #base-hp-bar { height: 100%; background-color: var(--base-color); transition: width 0.3s; }
         #base.damage { animation: shake 0.3s; }
-        .monster { position: absolute; width: 64px; height: 64px; background-color: transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .monster { position: absolute; width: 64px; height: 64px; background-color: transparent; cursor: pointer; }
         .monster::before { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 70%; height: 15px; background: rgba(0, 0, 0, 0.5); border-radius: 50%; filter: blur(4px); z-index: -1; }
         .monster.flying::before { bottom: -85px; transform: translateX(-50%) scale(0.8); background: rgba(0, 0, 0, 0.25); }
         .monster.monster-boss::before {
@@ -115,7 +115,8 @@
         .monster-large .monster-image { transform: scale(3.5); }
         .monster-medium .monster-image { transform: scale(1.8); }
         .monster-image { width: 100%; height: 100%; object-fit: contain; }
-        .monster.active { filter: drop-shadow(0 0 8px #ffc107); transform: scale(1.1); }
+        .monster.active { transform: scale(1.1); z-index: 1000 !important; }
+        .monster.active .monster-image { filter: drop-shadow(0 0 8px #ffc107); }
         .monster-status { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 5px; width: auto; white-space: nowrap; }
 
            .monster-boss .monster-status {
@@ -127,7 +128,7 @@
         .question-follow { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 8px; color: #ffeb3b; font-size: 1.5em; font-weight: bold; white-space: nowrap; pointer-events: none; z-index: 10; }
         .question-follow.long-question { white-space: normal; width: 350px; font-size: 1.1em; top: -80px; line-height: 1.4; }
         .question-follow.emoji-question { width: auto; font-size: 1.8em; }
-        #answer-ui-wrapper { position: absolute; bottom: 10px; left: 25%; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 15px; z-index: 100; }
+        #answer-ui-wrapper { position: absolute; bottom: 10px; left: 20px; display: flex; align-items: flex-end; gap: 15px; z-index: 100; }
         #left-input-area { display: flex; flex-direction: column; gap: 10px; }
         #answer-area { background-color: rgba(22, 33, 62, 0.95); padding: 10px; border-radius: 10px; border: 2px solid var(--ui-color); box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; }
         #answer-input { font-family: 'M PLUS Rounded 1c', sans-serif; width: 150px; padding: 10px; font-size: 1.8em; text-align: center; border: 2px solid #9a8c98; border-radius: 5px; -moz-appearance: textfield; }
@@ -139,7 +140,7 @@
         #numpad-enter { background-color: #1976d2; }
         .screen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; text-align: center; color: white; }
         .screen-overlay h1, .screen-overlay h2 { color: var(--ui-color); font-size: 3em; margin-bottom: 30px; }
-        .screen-overlay button, .numpad-button, #pause-button { font-family: 'M PLUS Rounded 1c', sans-serif; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.1s ease-in-out; }
+        .screen-overlay button, .numpad-button, #pause-button { font-family: 'M PLUS Rounded 1c', sans-serif; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.1s ease-in-out; touch-action: manipulation; }
         .screen-overlay button { font-size: 1.5em; padding: 15px 30px; background-color: var(--ui-color); color: #16213e; box-shadow: 0 5px 0 #c78100; }
         .screen-overlay button:hover { background-color: #e9c46a; }
         .screen-overlay button:active { transform: translateY(3px); box-shadow: 0 2px 0 #c78100; }
@@ -169,7 +170,7 @@
         .button-container { display: flex; gap: 20px; flex-direction: row; }
         #pause-screen .button-container { flex-direction: column; }
         .hidden { display: none; }
-        .damage-popup { position: absolute; font-size: 2em; font-weight: bold; color: #ffdd00; text-shadow: 2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000; pointer-events: none; animation: fade-up 1s ease-out forwards; z-index: 50; }
+        .damage-popup { position: absolute; font-size: 2em; font-weight: bold; color: #ffdd00; text-shadow: 2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000; pointer-events: none; animation: fade-up 1s ease-out forwards; z-index: 2000; }
         .damage-popup.wrong-answer { color: #e63946; }
         .damage-popup.gold-popup { color: #FFD700; font-size: 2.2em; }
         #bottom-right-ui-wrapper { position: absolute; bottom: 10px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 100; }
@@ -254,7 +255,7 @@
                 <div id="kill-counter">てんすう：0てん</div>
                 <div id="answer-area">
                     <label for="answer-input">こたえ：</label>
-                    <input type="number" id="answer-input">
+                    <input type="number" id="answer-input" inputmode="none">
                 </div>
             </div>
             <div id="numpad">
@@ -923,6 +924,7 @@ function startNextWave() {
                 monsterEl.dataset.id = monster.id;
                 monsterEl.style.left = `${monster.x}px`;
                 monsterEl.style.top = `${monster.y}px`;
+                monsterEl.style.zIndex = Math.floor(monster.initialY);
                 
                 let imagePrefix = '';
                 switch(monster.type) {
@@ -972,6 +974,7 @@ function startNextWave() {
                 questionEl.innerHTML = activeQuestion.question;
                 monster.element.appendChild(questionEl);
                 monster.element.classList.add('active');
+                monsterContainer.appendChild(monster.element); // 選択したモンスターを最前面に移動
                 answerInput.value = '';
                 answerInput.focus();
             }
@@ -987,7 +990,11 @@ function startNextWave() {
                 switch(type) {
                     case 'add': return { question: `${n1} + ${n2} = ?`, answer: n1 + n2 };
                     case 'fire': return { question: `${n1} + ${n2} = ?`, answer: n1 + n2 };
-                    case 'subtract': const max = Math.max(n1, n2), min = Math.min(n1, n2); return { question: `${max} - ${min} = ?`, answer: max - min };
+                    case 'subtract':
+                        let s1 = n1, s2 = n2;
+                        if (s1 === s2 && Math.random() < 0.9) { s2 = (s1 % 10) + 1; }
+                        const s_max = Math.max(s1, s2), s_min = Math.min(s1, s2);
+                        return { question: `${s_max} - ${s_min} = ?`, answer: s_max - s_min };
                     case 'multiply': const m1 = Math.floor(Math.random() * 9) + 1, m2 = Math.floor(Math.random() * 9) + 1; return { question: `${m1} × ${m2} = ?`, answer: m1 * m2 };
                     case 'divide': const d_ans = Math.floor(Math.random() * 8) + 2, d2 = Math.floor(Math.random() * 8) + 2; const d1 = d_ans * d2; return { question: `${d1} ÷ ${d2} = ?`, answer: d_ans };
                     case 'word':
