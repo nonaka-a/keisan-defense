@@ -118,10 +118,23 @@
         /* ↓↓ #start-screen .button-container のスタイルを調整します ↓↓ */
         #start-screen .button-container {
             position: absolute; /* 位置を自由に動かせるようにします */
-            bottom: 60px;       /* 下から60pxの位置に */
+            bottom: 30px;       /* 下から30pxの位置に */
             right: 60px;        /* 右から60pxの位置に */
             flex-direction: column; /* ボタンは縦並びのまま */
             gap: 15px;          /* ボタンとボタンの間隔 */
+        }
+        #link-gururizan-button {
+            font-size: 1.1em;
+            padding: 8px 30px;
+            line-height: 1.3;
+            background-color: #4fc3f7;
+            box-shadow: 0 5px 0 #0288d1;
+        }
+        #link-gururizan-button:hover {
+            background-color: #81d4fa;
+        }
+        #link-gururizan-button:active {
+            box-shadow: 0 2px 0 #0288d1;
         }
         .button-container { display: flex; gap: 20px; flex-direction: row; }
         #pause-screen .button-container { flex-direction: column; }
