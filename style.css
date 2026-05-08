@@ -136,6 +136,19 @@
         #link-gururizan-button:active {
             box-shadow: 0 2px 0 #0288d1;
         }
+        #link-jukugo-button {
+            font-size: 1.1em;
+            padding: 8px 30px;
+            line-height: 1.3;
+            background-color: #ff5252;
+            box-shadow: 0 5px 0 #d32f2f;
+        }
+        #link-jukugo-button:hover {
+            background-color: #ff867f;
+        }
+        #link-jukugo-button:active {
+            box-shadow: 0 2px 0 #d32f2f;
+        }
         .button-container { display: flex; gap: 20px; flex-direction: row; }
         #pause-screen .button-container { flex-direction: column; }
         .hidden { display: none; }
