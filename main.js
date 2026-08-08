@@ -79,6 +79,9 @@
             const manualButtonStart = document.getElementById('manual-button-start');
             const manualButtonPause = document.getElementById('manual-button-pause');
             const closeManualButton = document.getElementById('close-manual-button');
+            const otherGamesScreen = document.getElementById('other-games-screen');
+            const linkOtherGamesButton = document.getElementById('link-other-games-button');
+            const closeOtherGamesButton = document.getElementById('close-other-games-button');
             const waveStartScreen = document.getElementById('wave-start-screen');
             const waveTitle = document.getElementById('wave-title');
             const waveMonsterPreviews = document.getElementById('wave-monster-previews');
@@ -163,6 +166,7 @@
                 pauseScreen.classList.add('hidden');
                 resultScreen.classList.add('hidden');
                 manualScreen.classList.add('hidden'); 
+                otherGamesScreen.classList.add('hidden');
                 answerUiWrapper.classList.add('hidden');
                 pauseButton.classList.add('hidden');
                 bgmSound.pause();
@@ -918,6 +922,11 @@ function startNextWave() {
             manualButtonStart.addEventListener('click', openManual);
             manualButtonPause.addEventListener('click', openManual);
             closeManualButton.addEventListener('click', closeManual);
+
+            const openOtherGames = () => { playSound(clickSound); otherGamesScreen.classList.remove('hidden'); };
+            const closeOtherGames = () => { playSound(clickSound); otherGamesScreen.classList.add('hidden'); };
+            linkOtherGamesButton.addEventListener('click', openOtherGames);
+            closeOtherGamesButton.addEventListener('click', closeOtherGames);
             volumeButton.addEventListener('click', () => {
                 isMuted = !isMuted; // trueとfalseを切り替える
 
