@@ -162,6 +162,20 @@
         #link-todofuken-button:active {
             box-shadow: 0 2px 0 #8d6e63;
         }
+        #link-portal-button {
+            font-size: 1.1em;
+            padding: 8px 30px;
+            line-height: 1.3;
+            background-color: var(--ui-color);
+            color: #16213e;
+            box-shadow: 0 5px 0 #c78100;
+        }
+        #link-portal-button:hover {
+            background-color: #e9c46a;
+        }
+        #link-portal-button:active {
+            box-shadow: 0 2px 0 #c78100;
+        }
         #link-other-games-button {
             font-size: 1.5em;
             padding: 15px 30px;
