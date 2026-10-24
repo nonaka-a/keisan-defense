@@ -12,12 +12,16 @@ function initUI() {
         resultScreen: document.getElementById('result-screen'),
         resultScore: document.getElementById('result-score'),
         resultComment: document.getElementById('result-comment'),
+        resultDetailLabel: document.getElementById('result-detail-label'),
         resultWave: document.getElementById('result-wave'),
         resultGold: document.getElementById('result-gold'),
         wrongQuestionsList: document.getElementById('wrong-questions-list'),
         scoreEffectsContainer: document.getElementById('score-effects-container'),
         manualScreen: document.getElementById('manual-screen'),
-        otherGamesScreen: document.getElementById('other-games-screen')
+        otherGamesScreen: document.getElementById('other-games-screen'),
+        endlessSelectScreen: document.getElementById('endless-select-screen'),
+        rankingScreen: document.getElementById('ranking-screen'),
+        nameInputScreen: document.getElementById('name-input-screen')
     };
 
     const manualButtonStart = document.getElementById('manual-button-start');
@@ -51,20 +55,28 @@ function showDamagePopup(target, text, customClass = '') {
     p.addEventListener('animationend', () => p.remove());
 }
 
-function showResultScreen(isGameClear = false) {
+function showResultScreen(isGameClear = false, gameMode = 'normal', endlessKills = 0) {
     uiElements.answerUiWrapper.classList.add('hidden');
     uiElements.pauseButton.classList.add('hidden');
     uiElements.volumeButton.classList.add('hidden');
 
     uiElements.resultScore.textContent = killCount;
-    uiElements.resultComment.textContent = getScoreComment(killCount);
-    if (isGameClear) {
-        uiElements.resultWave.textContent = `Wave ${waveData.length} クリア`;
-    } else {
-        uiElements.resultWave.textContent = `Wave ${currentWaveIndex + 1}`;
-    }
     uiElements.resultGold.textContent = `${playerGold} G`;
     uiElements.wrongQuestionsList.innerHTML = '';
+
+    if (gameMode === 'endless') {
+        uiElements.resultDetailLabel.textContent = 'たおしたかず';
+        uiElements.resultWave.textContent = `${endlessKills} たい`;
+        uiElements.resultComment.textContent = `${endlessKills}たい やっつけた！`;
+    } else {
+        uiElements.resultDetailLabel.textContent = 'とうたつWave';
+        uiElements.resultComment.textContent = getScoreComment(killCount);
+        if (isGameClear) {
+            uiElements.resultWave.textContent = `Wave ${waveData.length} クリア`;
+        } else {
+            uiElements.resultWave.textContent = `Wave ${currentWaveIndex + 1}`;
+        }
+    }
 
     if (wrongAnswers.length === 0) {
         const li = document.createElement('li');

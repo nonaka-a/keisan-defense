@@ -51,6 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeButton = document.getElementById('volume-button');
     const allSounds = document.querySelectorAll('audio');
 
+    const endlessModeButton = document.getElementById('endless-mode-button');
+    const endlessSelectScreen = document.getElementById('endless-select-screen');
+    const endlessCharacterGrid = document.getElementById('endless-character-grid');
+    const endlessViewRankingButton = document.getElementById('endless-view-ranking-button');
+    const endlessBackButton = document.getElementById('endless-back-button');
+    const rankingScreen = document.getElementById('ranking-screen');
+    const rankingTabs = document.getElementById('ranking-tabs');
+    const rankingList = document.getElementById('ranking-list');
+    const closeRankingButton = document.getElementById('close-ranking-button');
+    const nameInputScreen = document.getElementById('name-input-screen');
+    const playerNameInput = document.getElementById('player-name-input');
+    const submitNameButton = document.getElementById('submit-name-button');
+    const nameInputScoreInfo = document.getElementById('name-input-score-info');
+
     let gameActive = false, isPaused = false, isPlacingItem = false, isWaveTransitioning = false;
     let baseHp, baseMaxHp, monsters = [], activeQuestion = null, monsterIdCounter = 0;
     let animationTimer;
@@ -59,6 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let availableRiddles = [];
     let bossAttackTimer = null;
 
+    let gameMode = 'normal';
+    let endlessMonsterType = 'add';
+    let endlessKills = 0;
+    let endlessSpawnTimer = null;
+    let endlessPreviewTimer = null;
+    let endlessPreviewFrames = {};
+
     function initGame() {
         baseMaxHp = BASE_INITIAL_HP; baseHp = baseMaxHp;
         monsters = []; monsterContainer.innerHTML = ''; effectsContainer.innerHTML = ''; slowFields = [];
@@ -66,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerGold = 0;
         wrongAnswers = [];
         availableRiddles = [...riddles];
+        endlessKills = 0;
         itemStates = { 
             upgrade_base: { currentPrice: items.upgrade_base.basePrice },
             sweep: { currentPrice: items.sweep.basePrice },
@@ -80,12 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('result-screen').classList.add('hidden');
         document.getElementById('manual-screen').classList.add('hidden'); 
         document.getElementById('other-games-screen').classList.add('hidden');
+        endlessSelectScreen.classList.add('hidden');
+        rankingScreen.classList.add('hidden');
+        nameInputScreen.classList.add('hidden');
         answerUiWrapper.classList.add('hidden');
         pauseButton.classList.add('hidden');
         bgmSound.pause();
         bossBgmSound.pause();
         currentWaveIndex = -1;
         clearTimeout(monsterSpawnTimer);
+        clearTimeout(endlessSpawnTimer);
         clearInterval(animationTimer);
         clearInterval(bossAttackTimer);
     }
@@ -96,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pauseButton.classList.remove('hidden');
         volumeButton.classList.remove('hidden');
         startScreen.classList.add('hidden');
+        endlessSelectScreen.classList.add('hidden');
         titleBackground.classList.add('hidden');
         answerInput.value = '';
         answerInput.focus();
@@ -103,7 +130,27 @@ document.addEventListener('DOMContentLoaded', () => {
         animationTimer = setInterval(animateMonsters, 300);
         bgmSound.volume = 0.3; playSound(bgmSound);
         requestAnimationFrame(gameLoop);
-        startNextWave();
+
+        if (gameMode === 'normal') {
+            startNextWave();
+        } else {
+            gameWrapper.style.backgroundImage = "url('images/background.png')";
+            scheduleNextEndlessSpawn();
+        }
+    }
+
+  function scheduleNextEndlessSpawn() {
+        if (!gameActive || isPaused || gameMode !== 'endless') return;
+        const level = Math.floor(endlessKills / 5);
+        const interval = Math.max(1000, 4500 - level * 250);
+        endlessSpawnTimer = setTimeout(() => {
+            if (!gameActive || isPaused) return;
+            const extraCount = Math.min(3, 1 + Math.floor(level / 3));
+            for (let i = 0; i < extraCount; i++) {
+                spawnMonster(endlessMonsterType, -80 - (i * 70));
+            }
+            scheduleNextEndlessSpawn();
+        }, interval);
     }
 
     function startNextWave() {
@@ -180,20 +227,37 @@ document.addEventListener('DOMContentLoaded', () => {
         monsterSpawnTimer = setTimeout(spawnWaveMonsters, interval);
     }
 
-    function stopAllTimers() { clearInterval(animationTimer); clearTimeout(monsterSpawnTimer); clearInterval(bossAttackTimer); }
+    function stopAllTimers() { 
+        clearInterval(animationTimer); 
+        clearTimeout(monsterSpawnTimer); 
+        clearTimeout(endlessSpawnTimer);
+        clearInterval(bossAttackTimer); 
+    }
     function pauseGame() { if (!gameActive || isPaused || isWaveTransitioning) return; playSound(clickSound); isPaused = true; bgmSound.pause(); bossBgmSound.pause(); pauseScreen.classList.remove('hidden'); }
     function resumeGame() { 
         if (!gameActive || !isPaused) return; 
         playSound(clickSound); 
         isPaused = false; 
-        if (currentWaveIndex === waveData.length - 1) {
-            playSound(bossBgmSound);
+        if (gameMode === 'endless') {
+            if (baseHp <= 20) {
+                playSound(bossBgmSound);
+            } else {
+                playSound(bgmSound);
+            }
         } else {
-            playSound(bgmSound);
+            if (currentWaveIndex === waveData.length - 1) {
+                playSound(bossBgmSound);
+            } else {
+                playSound(bgmSound);
+            }
         }
         pauseScreen.classList.add('hidden'); 
         answerInput.focus(); 
-        spawnWaveMonsters();
+        if (gameMode === 'normal') {
+            spawnWaveMonsters();
+        } else {
+            scheduleNextEndlessSpawn();
+        }
     }
     
     function handleQuitGame() {
@@ -213,6 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function moveMonsters() {
         monsters.forEach(monster => {
             let currentSpeed = monster.baseSpeed;
+            if (gameMode === 'endless') {
+                const speedMultiplier = 1 + (Math.floor(endlessKills / 5) * 0.1);
+                currentSpeed = Math.min(monster.baseSpeed * 2.5, monster.baseSpeed * speedMultiplier);
+            }
             if (!monster.isFlying) {
                 let isInSlowField = false;
                 for (const field of slowFields) {
@@ -244,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(monsters[monsterIndex].element) monsters[monsterIndex].element.remove();
                     monsters.splice(monsterIndex, 1);
                 }
-                checkWaveCompletion();
+                if (gameMode === 'normal') checkWaveCompletion();
             }
         }
     }
@@ -261,9 +329,16 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'boss': gold = 0; score = 8; break;
             case 'fire': gold = 0; score = 0; break;
         }
-        if (itemStates.gold_bonus.purchased && monster.type !== 'fire' && monster.type !== 'boss') { gold *= 2; }
-        playerGold += gold;
-        killCount = Math.min(killCount + score, 100);
+
+        if (gameMode === 'normal') {
+            if (itemStates.gold_bonus.purchased && monster.type !== 'fire' && monster.type !== 'boss') { gold *= 2; }
+            playerGold += gold;
+            killCount = Math.min(killCount + score, 100);
+        } else {
+            killCount += score;
+            endlessKills++;
+        }
+
         updateGoldDisplay();
         updateKillCounter();
         if (monster.isBoss) {
@@ -275,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(monsters[monsterIndex].element) monsters[monsterIndex].element.remove();
             monsters.splice(monsterIndex, 1);
         }
-        checkWaveCompletion();
+        if (gameMode === 'normal') checkWaveCompletion();
     }
 
     function checkWaveCompletion() {
@@ -323,7 +398,14 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (killCount >= 40) { playSound(gameoverMidSound); }
             else { playSound(gameoverLowSound); }
         }
-        showResultScreen(false);
+
+        if (gameMode === 'endless' && !isQuit && isRankIn(endlessMonsterType, killCount)) {
+            nameInputScoreInfo.textContent = `てんすう：${killCount}てん（たおしたかず：${endlessKills}たい）`;
+            playerNameInput.value = '';
+            nameInputScreen.classList.remove('hidden');
+        } else {
+            showResultScreen(false, gameMode, endlessKills);
+        }
     }
     
     function gameClear() {
@@ -332,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bossBgmSound.pause();
         playSound(gameClearSound);
         updateKillCounter();
-        showResultScreen(true);
+        showResultScreen(true, gameMode, endlessKills);
     }
 
     function damageBase(damage) {
@@ -341,9 +423,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBaseHpUI();
         baseElement.classList.add('damage');
         setTimeout(() => baseElement.classList.remove('damage'), 300);
+
+        if (gameMode === 'endless' && gameActive && !isPaused && baseHp > 0 && baseHp <= 20) {
+            if (!bossBgmSound.playing && bgmSound.currentTime > 0) {
+                bgmSound.pause();
+                bossBgmSound.volume = 0.4;
+                playSound(bossBgmSound);
+            }
+        }
+
         if (baseHp <= 0) { gameOver(); }
     }
-    
     function buyItem(itemId) {
         if (isPaused || isPlacingItem || isWaveTransitioning || (itemStates[itemId] && itemStates[itemId].purchased)) return;
         const item = items[itemId];
@@ -450,8 +540,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gameActive) return;
         const stats = monsterBaseStats[monsterType];
         const monster = { id: monsterIdCounter++, type: monsterType, animationFrame: 1, baseSpeed: stats.baseSpeed, isFlying: !!stats.isFlying, isHopping: !!stats.isHopping, isBoss: !!stats.isBoss };
-        const wavesSinceDebut = currentWaveIndex - stats.firstAppearanceWave;
-        monster.hp = monster.isBoss ? stats.hp : Math.floor(stats.hp * Math.pow(1.3, wavesSinceDebut));
+        
+        if (gameMode === 'endless') {
+            monster.hp = Math.max(1, Math.floor(stats.hp / 2));
+        } else {
+            const wavesSinceDebut = currentWaveIndex - stats.firstAppearanceWave;
+            monster.hp = monster.isBoss ? stats.hp : Math.floor(stats.hp * Math.pow(1.3, wavesSinceDebut));
+        }
+
         let monsterY;
         if (customY !== null) {
             monsterY = customY;
@@ -462,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (monster.isFlying) {
                     monsterY = (gameWrapper.offsetHeight * 0.2); 
                 } else {
-                    monsterY = (gameWrapper.offsetHeight * 0.35) + (Math.random() * 40 - 20) + (monster.isHopping ? 0 : 0);
+                    monsterY = (gameWrapper.offsetHeight * 0.35) + (Math.random() * 40 - 20);
                 }
             }
         }
@@ -680,9 +776,156 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('start-button').addEventListener('click', () => { unlockAudio(); playSound(clickSound); initGame(); startGame(); });
-    resultRestartButton.addEventListener('click', () => { playSound(clickSound); initGame(); startGame(); });
-    resultTitleButton.addEventListener('click', () => { playSound(clickSound); initGame(); });
+    function renderEndlessCharacterSelect() {
+        endlessCharacterGrid.innerHTML = '';
+        endlessCharacters.forEach(char => {
+            const tile = document.createElement('div');
+            tile.className = 'endless-char-tile';
+            tile.dataset.type = char.type;
+            tile.innerHTML = `
+                <img class="endless-char-img" id="preview-img-${char.type}" src="images/monster-${char.prefix}1.png" alt="${char.name}">
+                <span class="endless-char-name">${char.name}</span>
+            `;
+            tile.addEventListener('click', () => {
+                playSound(clickSound);
+                stopEndlessPreviewAnimation();
+                gameMode = 'endless';
+                endlessMonsterType = char.type;
+                initGame();
+                startGame();
+            });
+            endlessCharacterGrid.appendChild(tile);
+            endlessPreviewFrames[char.type] = 1;
+        });
+        startEndlessPreviewAnimation();
+    }
+
+    function startEndlessPreviewAnimation() {
+        stopEndlessPreviewAnimation();
+        endlessPreviewTimer = setInterval(() => {
+            endlessCharacters.forEach(char => {
+                endlessPreviewFrames[char.type] = (endlessPreviewFrames[char.type] % char.frames) + 1;
+                const img = document.getElementById(`preview-img-${char.type}`);
+                if (img) {
+                    img.src = `images/monster-${char.prefix}${endlessPreviewFrames[char.type]}.png`;
+                }
+            });
+        }, 300);
+    }
+
+    function stopEndlessPreviewAnimation() {
+        if (endlessPreviewTimer) {
+            clearInterval(endlessPreviewTimer);
+            endlessPreviewTimer = null;
+        }
+    }
+
+    function getRankingData(type) {
+        const data = localStorage.getItem(`sansu_ranking_${type}`);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function saveRankingData(type, ranking) {
+        localStorage.setItem(`sansu_ranking_${type}`, JSON.stringify(ranking));
+    }
+
+    function isRankIn(type, score) {
+        if (score <= 0) return false;
+        const ranking = getRankingData(type);
+        if (ranking.length < 5) return true;
+        return score > ranking[ranking.length - 1].score;
+    }
+
+    function addRankingRecord(type, name, score, kills) {
+        let ranking = getRankingData(type);
+        ranking.push({ name: name || 'ななし', score: score, kills: kills });
+        ranking.sort((a, b) => b.score - a.score);
+        ranking = ranking.slice(0, 5);
+        saveRankingData(type, ranking);
+    }
+
+    function showRankingModal(defaultType = 'add') {
+        rankingTabs.innerHTML = '';
+        endlessCharacters.forEach(char => {
+            const tab = document.createElement('button');
+            tab.className = `ranking-tab ${char.type === defaultType ? 'active' : ''}`;
+            tab.textContent = char.name;
+            tab.addEventListener('click', () => {
+                playSound(clickSound);
+                document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderRankingList(char.type);
+            });
+            rankingTabs.appendChild(tab);
+        });
+        renderRankingList(defaultType);
+        rankingScreen.classList.remove('hidden');
+    }
+
+   function renderRankingList(type) {
+        rankingList.innerHTML = '';
+        const ranking = getRankingData(type);
+        if (ranking.length === 0) {
+            rankingList.innerHTML = '<div class="ranking-empty">まだ きろくが ありません</div>';
+            return;
+        }
+        ranking.forEach(r => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${r.name}</span><span>${r.score}てん</span>`;
+            rankingList.appendChild(li);
+        });
+    }
+
+    document.getElementById('start-button').addEventListener('click', () => { 
+        unlockAudio(); 
+        playSound(clickSound); 
+        gameMode = 'normal';
+        initGame(); 
+        startGame(); 
+    });
+
+    endlessModeButton.addEventListener('click', () => {
+        unlockAudio();
+        playSound(clickSound);
+        startScreen.classList.add('hidden');
+        endlessSelectScreen.classList.remove('hidden');
+        renderEndlessCharacterSelect();
+    });
+
+    endlessBackButton.addEventListener('click', () => {
+        playSound(clickSound);
+        stopEndlessPreviewAnimation();
+        endlessSelectScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+    });
+
+    endlessViewRankingButton.addEventListener('click', () => {
+        playSound(clickSound);
+        showRankingModal(endlessCharacters[0].type);
+    });
+
+    closeRankingButton.addEventListener('click', () => {
+        playSound(clickSound);
+        rankingScreen.classList.add('hidden');
+    });
+
+    submitNameButton.addEventListener('click', () => {
+        playSound(clickSound);
+        const playerName = playerNameInput.value.trim() || 'ななし';
+        addRankingRecord(endlessMonsterType, playerName, killCount, endlessKills);
+        nameInputScreen.classList.add('hidden');
+        showResultScreen(false, gameMode, endlessKills);
+    });
+
+    resultRestartButton.addEventListener('click', () => { 
+        playSound(clickSound); 
+        initGame(); 
+        startGame(); 
+    });
+    resultTitleButton.addEventListener('click', () => { 
+        playSound(clickSound); 
+        initGame(); 
+    });
     
     answerInput.addEventListener('keydown', handleAnswerSubmit);
     answerInput.addEventListener('input', (e) => {
@@ -719,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             volumeButton.textContent = '♪';
             if (gameActive && !isPaused) {
-                 if (currentWaveIndex === waveData.length - 1) {
+                if (currentWaveIndex === waveData.length - 1 && gameMode === 'normal') {
                     playSound(bossBgmSound);
                 } else {
                     playSound(bgmSound);

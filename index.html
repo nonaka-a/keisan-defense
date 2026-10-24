@@ -4,30 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>さんすうドリル ディフェンス</title>
-<!-- 1. サイトのタイトル -->
     <meta property="og:title" content="さんすうドリル ディフェンス">
-
-    <!-- 2. サイトの説明文 -->
     <meta property="og:description" content="モンスターを計算でやっつけろ！新感覚の計算ドリル×タワーディフェンスゲーム！">
-
-    <!-- 3. サイトの種類（Webサイトやブログ、記事など） -->
     <meta property="og:type" content="website">
-
-    <!-- 4. サイトのURL（ゲームをアップロードしたページのURL） -->
     <meta property="og:url" content="https://akkeynoa.web.fc2.com/game/keisan-defense/keisan-defense.html">
-
-    <!-- 5. サムネイル画像のURL（1200x630ピクセル推奨） -->
     <meta property="og:image" content="https://akkeynoa.web.fc2.com/game/keisan-defense/images/ogp-image.png">
-
-    <!-- 6. サイト名 -->
     <meta property="og:site_name" content="さんすうドリル ディフェンス">
-
-    <!-- 7. Twitter用の設定（カードの種類） -->
     <meta name="twitter:card" content="summary_large_image">
-
-    <!-- ↑↑ ここまでOGP設定を追加 ↑↑ -->
-
-    <audio id="bgm-sound" src="sounds/bgm.mp3" loop></audio>
 
     <audio id="bgm-sound" src="sounds/bgm.mp3" loop></audio>
     <audio id="correct-sound" src="sounds/correct.mp3"></audio>
@@ -45,21 +28,18 @@
     <audio id="wave-start-sound" src="sounds/wave-start.mp3"></audio>
     <audio id="wave-clear-sound" src="sounds/wave-clear.mp3"></audio>
 
-
     <link rel="stylesheet" href="style.css">
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XE2BKG5S67"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-XE2BKG5S67');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XE2BKG5S67"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XE2BKG5S67');
+    </script>
 </head>
 <body>
     <div id="game-wrapper">
-         <div id="background-overlay"></div>
+        <div id="background-overlay"></div>
         <div id="effects-container"></div>
         <div id="monster-container"></div>
         <div id="base">
@@ -106,20 +86,52 @@
             <div id="wave-monster-previews"></div>
         </div>
 
-               <!-- ↓↓ ここにタイトル画像用のimgタグを追加・移動します ↓↓ -->
         <img id="title-background" src="images/title-background.png" class="hidden">
 
         <div id="start-screen" class="screen-overlay">
-            <!-- <h1>は不要なので削除またはコメントアウトします -->
-            <!-- <h1>さんすうドリル ディフェンス</h1> -->
-
             <div class="button-container" style="flex-direction: column;">
                 <button id="start-button">ゲームスタート</button>
                 <button id="manual-button-start">あそびかた</button>
+                <button id="endless-mode-button">エンドレスモード</button>
                 <button id="link-other-games-button">他のゲーム</button>
             </div>
         </div>
-        
+
+        <div id="endless-select-screen" class="screen-overlay hidden">
+            <div class="endless-select-content">
+                <h2>エンドレスモード</h2>
+                <p class="endless-description">とくていの てきだけえらんで、けいさんの れんしゅうを しよう！</p>
+                <div id="endless-character-grid"></div>
+                <div class="button-container" style="margin-top: 15px; justify-content: center;">
+                    <button id="endless-view-ranking-button">ランキングをみる</button>
+                    <button id="endless-back-button">もどる</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ranking-screen" class="screen-overlay hidden">
+            <div class="ranking-content">
+                <h2>ランキング</h2>
+                <div id="ranking-tabs"></div>
+                <div id="ranking-list-container">
+                    <ol id="ranking-list"></ol>
+                </div>
+                <button id="close-ranking-button">とじる</button>
+            </div>
+        </div>
+
+        <div id="name-input-screen" class="screen-overlay hidden">
+            <div class="name-input-content">
+                <h2>ランクイン！</h2>
+                <p id="name-input-score-info"></p>
+                <p>なまえを いれてね（６もじまで）</p>
+                <input type="text" id="player-name-input" maxlength="6" placeholder="なまえ">
+                <div class="button-container" style="margin-top: 15px; justify-content: center;">
+                    <button id="submit-name-button">とうろく</button>
+                </div>
+            </div>
+        </div>
+
         <div id="pause-screen" class="screen-overlay hidden">
             <h1>とまってるよ</h1>
             <div class="button-container">
@@ -142,7 +154,7 @@
                 </div>
                 <div class="result-details-grid">
                     <div class="result-detail-item">
-                        <div class="result-detail-title">とうたつWave</div>
+                        <div class="result-detail-title" id="result-detail-label">とうたつWave</div>
                         <div id="result-wave" class="result-detail-value"></div>
                     </div>
                     <div class="result-detail-item">
@@ -187,7 +199,7 @@
         <button id="close-manual-button">とじる</button>
     </div>
 
-   <div id="other-games-screen" class="screen-overlay hidden">
+    <div id="other-games-screen" class="screen-overlay hidden">
         <div class="other-games-content">
             <h2>他のゲーム</h2>
             <div class="other-games-buttons-container">

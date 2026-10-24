@@ -11,6 +11,15 @@ const waveData = [
     { title: 'さいごの けっせん！', monsters: ['boss'] }
 ];
 
+const endlessCharacters = [
+    { type: 'add', name: 'たしざん', prefix: '', frames: 3 },
+    { type: 'subtract', name: 'ひきざん', prefix: 'sub-', frames: 3 },
+    { type: 'multiply', name: 'かけざん', prefix: 'mul-', frames: 3 },
+    { type: 'divide', name: 'わりざん', prefix: 'div-', frames: 3 },
+    { type: 'emoji', name: 'えもじ', prefix: 'emoji-', frames: 3 },
+    { type: 'word', name: 'ぶんしょう', prefix: 'word-', frames: 3 }
+];
+
 const items = {
     'damage_boost': { name: 'ゆうしゃのけん', description: 'でんせつの けん！ これが あれば、けいさんの こたえが ２ばいの ダメージに なる！', basePrice: 600, icon: 'images/damage-boost.png' },
     'gold_bonus': { name: 'おかねもちモンスター', description: 'モンスターが ゴールドを たくさん おとしてくれるように なるよ！', basePrice: 500, icon: 'images/gold-bonus.png' },
